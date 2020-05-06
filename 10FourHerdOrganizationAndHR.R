@@ -53,4 +53,10 @@ ver <- getverticeshr(kud.herd, 95)
 plot(ver, col = 1:4)
 #ver_50 <- getverticeshr(kud.herd, 50)
 #plot(ver_50, col = 1:4)
+
+proj.crs <- "+proj=utm +zone=12 +datum=WGS84 +units=m +no_defs +ellps=WGS84"
+ver.projed <- spTransform(ver,crs(proj.crs))
+ver.buffered <- gBuffer(ver.projed, byid = TRUE, id = ver.projed$id, 5000)
+plot(ver.buffered, col = 1:4)
 writeOGR(ver, getwd(), layer = "HR_90kud_4herds_20Ind", driver="ESRI Shapefile")
+writeOGR(ver.buffered, getwd(), layer = "HR_90kud_4herds_20Ind_5km", driver="ESRI Shapefile")
