@@ -2,6 +2,7 @@
 ## input: 
 #### polygon: land management agency 
 #### polygon: 4 herd HR + 5km buffer
+#### raster: NLCD every year
 
 library(raster)
 library(sp)
@@ -34,7 +35,6 @@ target.crs <- CRS("+proj=utm +zone=12 +datum=WGS84 +units=m +no_defs +ellps=WGS8
 # writeOGR(Mngt_Agency.1, "SurfMngtAgency_AOI_clean.shp", "Surf Mngt Agency", driver = 'ESRI Shapefile')
 # ######################################
 
-###### calculating four herds agency overlap ##########
 Mngt_Agency <- readOGR("SurfMngtAgency_AOI_clean.shp")
 Mngt_Agency <- Mngt_Agency[,2]
 fourherds_by_agency <- raster::intersect(elk_ranges, Mngt_Agency)
@@ -44,8 +44,9 @@ fourherds_by_agency <- raster::intersect(elk_ranges, Mngt_Agency)
 fourherds_by_agency$area = area(fourherds_by_agency)/1000000
 fourherds_by_agency_df <- aggregate(area~ id + Reclass, data = fourherds_by_agency, FUN = sum)
 
-###### calculating four herds NLCD overlap ##########
-#set breaks
+##############################################################################################################################
+#################### calculating four herds NLCD every year by agency ########################################################
+##############################################################################################################################
 # from 1 to 8: water, developed, barren, forest, grass/shrub, pasture/cultivated, wetlands,ice/snow
 pal <- c('#FFFFFF', '#1FBCFF', '#D85031', '#B3AC9F', '#418938', '#D3D000', '#83CE37', '#B184FF', '#67E3FF')
 
@@ -82,10 +83,9 @@ NLCD.df <- cbind(NLCD.df[,10:11], NLCD.df[,9], NLCD.df[,1:8])
 #write.csv(NLCD.df, "NLCD_4herd_w_agency.csv")
 
 
-
-#### LC change matrix #####
-# N1 <- raster("FourHerd_LC_NLCD/projection_wrong/FOURherds_NLCD_2001.tif")
-# N2 <- raster("FourHerd_LC_NLCD/projection_wrong/FOURherds_NLCD_2004.tif")
+##################################################################################################
+############### LC change matrix/hotspot########## ###############################################
+##################################################################################################
 # 
 # s <- stack(NLCD1, NLCD2)
 # levelplot(s, col.regions = pal, att = 'ID')
