@@ -11,6 +11,8 @@ AOI <- spTransform(AOI, target.crs)
 elk_HR_25ind <- readOGR("C:/Users/wenjing.xu/Google Drive/RESEARCH/Elk/Analysis/GYE-Elk-LULC/AllHerd_25ind_w_Agency_clean.shp")
 elk_HR_25ind <- spTransform(elk_HR_25ind, target.crs)
 
+
+
 ###############################################################
 ############ cleaning LCMAP data ##############################
 ###############################################################
@@ -76,6 +78,9 @@ for (i in 1:length(LCPRI_HR)) {
 
 LCPRI.df <- cbind(LCPRI.df[,10:11], LCPRI.df[,9], LCPRI.df[,1:8])
 names(LCPRI.df) <- c( "herd", "agency", "year", "developed", "cropland", "grass_shrub", "tree_cover", "water", "wetland", "ice_snow", "barrern")
+# LCPRI.df.25ind <- LCPRI.df
+# write.csv(LCPRI.df, "LCPRI_allHerds_25ind.csv")
+
 
 ## horizontal bar plot # reflect a base info
 ## plot 1.1 ## pri-pub ratio across years for each herd
