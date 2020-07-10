@@ -12,6 +12,7 @@ library(forcats)
 library(ggplot2)
 library(ggspatial)
 library(hrbrthemes)
+library(cowplot)
 
 # data prep #
 # csv data#
@@ -65,7 +66,7 @@ p1.1
 ## plot 1.2 ## averaged % LULC across years for each herd
 LCPRI_25ind.2 <- LCPRI_25ind %>% 
   tidyr::gather ("Land_Cover", "area", 4:11) %>%
-  group_by(herd, year, Land_Cover) %>% summarise(area = sum(area))
+  group_by(herd, year, Land_Cover) %>% summarise(area = sum(area)*30*30/1000000)
 LCPRI_25ind.2 <- LCPRI_25ind.2 %>% group_by(herd, Land_Cover) %>% summarise(area = mean(area))
 LCPRI_25ind.22 <- LCPRI_25ind.2 %>% group_by(herd) %>% summarise(total.area = sum(area))
 LCPRI_25ind.2 <- LCPRI_25ind.2 %>% left_join(LCPRI_25ind.22, by = "herd")
@@ -78,14 +79,77 @@ p1.2 <- ggplot(LCPRI_25ind.2, aes(x=herd, y = area, fill = Land_Cover)) +
   scale_fill_manual(values = c("#FF5D51", "#FDDC58", "#CAE9B0", "#3bbf4e", "#2E95D4", "#9FDAFF", "#F8FCFF", "#D1D1D1")) +
   theme(axis.text.x = element_text(angle = 90, hjust=1)) +
   theme(legend.title=element_blank()) +
-  labs(title = "Averge LC area 1985-2007", x = element_blank(), y = element_blank()) +
+  labs(title = "Averge LC area (km2) 1985-2007", x = element_blank(), y = element_blank()) +
   theme(plot.title = element_text(size=14))
 p1.2
 
 ## line plot ##
+LCPRI_25ind.3 <- LCPRI_25ind %>% group_by(herd, year) %>% 
+  mutate(total.area = (sum(developed + cropland + grass_shrub + tree_cover + water + wetland + ice_snow + barren)))
 ## plot 2.1 # %HR that is developed over years for each herd, all ownership
-## plot 2.2 # %HR that is cropland over years for each herd, all ownership
-## plot 2.3 # %HR that is tree over years for each herd, all ownership
+  LCPRI_25IND_DEV <- LCPRI_25ind.3 %>% group_by(herd, year, total.area) %>% 
+    summarise(area = (sum(developed))) %>% mutate(perc = area/total.area*100)
+  p2.1 <- LCPRI_25IND_DEV %>%
+    ggplot(aes(x = year, y=perc, group = herd, color = herd)) +
+    geom_line(size = 1.2) +
+    theme_ipsum() +
+    scale_color_brewer(palette="Paired") +
+    theme(legend.title=element_blank()) +
+    labs(title = "Developed area (%HR)", x = element_blank(), y = element_blank()) +
+    theme(plot.title = element_text(size=14))+ 
+    theme(legend.position = "none")
+  ## plot 2.2 # %HR that is cropland over years for each herd, all ownership
+  LCPRI_25IND_AG <- LCPRI_25ind.3 %>% group_by(herd, year, total.area) %>% 
+    summarise(area = (sum(cropland))) %>% mutate(perc = area/total.area*100)
+  p2.2 <- LCPRI_25IND_AG %>%
+    ggplot(aes(x = year, y=perc, group = herd, color = herd)) +
+    geom_line(size = 1.2) +
+    theme_ipsum() +
+    scale_color_brewer(palette="Paired") +
+    theme(legend.title=element_blank()) +
+    labs(title = "Agriculture area (%HR)", x = element_blank(), y = element_blank()) +
+    theme(plot.title = element_text(size=14))+ 
+    theme(legend.position = "none")
+  
+  # if without Targhee
+  # p2.2.noT <-LCPRI_25ind.3 %>% filter(herd != "Targhee") %>% group_by(herd, year, total.area) %>% 
+  #   summarise(area = (sum(cropland))) %>% mutate(perc = area/total.area*100) %>%
+  #   ggplot(aes(x = year, y=perc, group = herd, color = herd)) +
+  #   geom_line(size = 1.2) +
+  #   theme_ipsum() +
+  #   scale_color_brewer(palette="Paired") +
+  #   theme(legend.title=element_blank()) +
+  #   labs(title = "Agriculture area (%HR)", x = element_blank(), y = element_blank()) +
+  #   theme(plot.title = element_text(size=14))
+  
+  ## plot 2.3 # %HR that is tree over years for each herd, all ownership
+  LCPRI_25IND_TREE <- LCPRI_25ind.3 %>% group_by(herd, year, total.area) %>% 
+    summarise(area = (sum(tree_cover))) %>% mutate(perc = area/total.area*100)
+  p2.3 <- LCPRI_25IND_TREE %>%
+    ggplot(aes(x = year, y=perc, group = herd, color = herd)) +
+    geom_line(size = 1.2) +
+    theme_ipsum() +
+    scale_color_brewer(palette="Paired") +
+    theme(legend.title=element_blank()) +
+    labs(title = "Tree cover (%HR)", x = element_blank(), y = element_blank()) +
+    theme(plot.title = element_text(size=14))+ 
+    theme(legend.position = "none")
+  ## plot 2.4 # %HR that is grass_shrub years for each herd, all ownership
+  LCPRI_25IND_GRS <- LCPRI_25ind.3 %>% group_by(herd, year, total.area) %>% 
+    summarise(area = (sum(grass_shrub))) %>% mutate(perc = area/total.area*100)
+  p2.4 <- LCPRI_25IND_GRS %>%
+    ggplot(aes(x = year, y=perc, group = herd, color = herd)) +
+    geom_line(size = 1.2) +
+    theme_ipsum() +
+    scale_color_brewer(palette="Paired") +
+    theme(legend.title=element_blank()) +
+    labs(title = "Grass/shrub area (%HR)", x = element_blank(), y = element_blank()) +
+    theme(plot.title = element_text(size=14))+ 
+    theme(legend.position = "none")
+  
+  plot_grid(p2.1, p2.2, p2.3, p2.4)
+
+  
 ## who are the top 3 for each category??
 
 ## line plot ##
