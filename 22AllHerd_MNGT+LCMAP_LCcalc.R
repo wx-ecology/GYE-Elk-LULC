@@ -244,5 +244,56 @@ plot_grid(p3.1, p3.2, p3.3, p3.4)
 ##################################################
 ## stacked bar plot ####################################################
 ##################################################
+LCPRI_25ind.4.dev <- LCPRI_25ind.3 %>% filter(year %in% c(1985, 2017)) %>% group_by(herd, agency, year) %>% 
+  summarise(area = (sum(developed))) %>% pivot_wider(names_from = year, values_from = area) 
+names(LCPRI_25ind.4.dev)[3:4] <- c("y1985", 'y2017')
+LCPRI_25ind.4.dev <- LCPRI_25ind.4.dev %>% mutate(rate = (y2017 - y1985)*100/y1985)
+p4.1 <- ggplot(LCPRI_25ind.4.dev, aes(fill=agency, y=rate, x=herd)) + 
+  geom_bar(position="stack", stat="identity", width=.4)+
+  theme_ipsum(base_size = 12, axis_title_size = 14) +
+  theme(axis.text.x = element_text(angle = 0, hjust=1)) +
+  theme(legend.position = "none") +
+  labs(title = "Developed", x = element_blank(), y = element_blank()) +
+  coord_flip() +
+  ylim(-65, 50)
 
+LCPRI_25ind.4.crop <- LCPRI_25ind.3 %>% filter(year %in% c(1985, 2017)) %>% group_by(herd, agency, year) %>% 
+  summarise(area = (sum(cropland))) %>% pivot_wider(names_from = year, values_from = area) 
+names(LCPRI_25ind.4.crop)[3:4] <- c("y1985", 'y2017')
+LCPRI_25ind.4.crop <- LCPRI_25ind.4.crop %>% mutate(rate = (y2017 - y1985)*100/y1985)
+p4.2 <- ggplot(LCPRI_25ind.4.crop, aes(fill=agency, y=rate, x=herd)) + 
+  geom_bar(position="stack", stat="identity", width=.4)+
+  theme_ipsum(base_size = 12, axis_title_size = 14) +
+  theme(axis.text.x = element_text(angle = 0, hjust=1)) +
+  theme(legend.position = "none") +
+  labs(title = "Cropland", x = element_blank(), y = element_blank()) +
+  coord_flip() +
+  ylim(-65, 50)
 
+LCPRI_25ind.4.GRS <- LCPRI_25ind.3 %>% filter(year %in% c(1985, 2017)) %>% group_by(herd, agency, year) %>% 
+  summarise(area = (sum(grass_shrub))) %>% pivot_wider(names_from = year, values_from = area) 
+names(LCPRI_25ind.4.GRS)[3:4] <- c("y1985", 'y2017')
+LCPRI_25ind.4.GRS <- LCPRI_25ind.4.GRS %>% mutate(rate = (y2017 - y1985)*100/y1985)
+p4.3 <- ggplot(LCPRI_25ind.4.GRS, aes(fill=agency, y=rate, x=herd)) + 
+  geom_bar(position="stack", stat="identity", width=.4)+
+  theme_ipsum(base_size = 12, axis_title_size = 14) +
+  theme(axis.text.x = element_text(angle = 0, hjust=1)) +
+  theme(legend.position = "none") +
+  labs(title = "Grass/shrub", x = element_blank(), y = element_blank()) +
+  coord_flip() +
+  ylim(-65, 50)
+
+LCPRI_25ind.4.tree <- LCPRI_25ind.3 %>% filter(year %in% c(1985, 2017)) %>% group_by(herd, agency, year) %>% 
+  summarise(area = (sum(tree_cover))) %>% pivot_wider(names_from = year, values_from = area) 
+names(LCPRI_25ind.4.tree)[3:4] <- c("y1985", 'y2017')
+LCPRI_25ind.4.tree <- LCPRI_25ind.4.tree %>% mutate(rate = (y2017 - y1985)*100/y1985)
+p4.4 <- ggplot(LCPRI_25ind.4.tree, aes(fill=agency, y=rate, x=herd)) + 
+  geom_bar(position="stack", stat="identity", width=.4)+
+  theme_ipsum(base_size = 12, axis_title_size = 14) +
+  theme(axis.text.x = element_text(angle = 0, hjust=1)) +
+  #theme(legend.position = "none") +
+  labs(title = "Tree Cover", x = element_blank(), y = element_blank()) +
+  coord_flip() +
+  ylim(-65, 50)
+
+plot_grid(p4.1, p4.2, p4.3, p4.4)
